@@ -10,10 +10,14 @@ app.use(express.urlencoded({ extended: true }));
 const productsSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: [true, "Product title is required."],
+        minlength: 3,
+        trim: true
     },
     price: {
         type: Number,
+        min: [100, "Minimum price of the product should be 100."],
+        max: [2000, "Maximum price of the product should be 2000."],
         required: true
     },
     description: {
@@ -155,6 +159,30 @@ app.get('/product', async (req, res) => {
     }
 
    
+})
+
+
+
+// update by id
+app.put('/product/:id', async(req, res)=> {
+
+    try {
+        const id = req.params.id;
+
+        const product = await Product.updateOne(
+            {_id: id }, 
+            { $set: {rating: 3.1 }},
+            { new: true }
+        );
+
+        if(product){
+            res.status(200).send(product);
+        }else{
+            res.status(404).send({message: "products not found"});
+        }
+    } catch (error) {
+        res.status(500).send({message: error});
+    }
 })
 
 
