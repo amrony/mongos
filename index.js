@@ -20,6 +20,10 @@ const productsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    rating: {
+        type: Number,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -50,13 +54,14 @@ app.get('/', (req, res)=> {
 // Create
 app.post('/products', async(req, res)=> {
     try {
-        const { title, price, description } = req.body;
+        const { title, price, description, rating } = req.body;
         // console.log("Body", title);
 
         const newProduct = new Product({
             title: title,
             price: price,
-            description: description
+            description: description,
+            rating: rating
         });
 
         // only one data save
@@ -78,6 +83,7 @@ app.post('/products', async(req, res)=> {
 
         res.status(201).send(productData);
     } catch (error) {
+        console.log("Error", error);
         res.status(500).send({message: error});
     }
 })
@@ -115,14 +121,17 @@ app.get('/products/:id', async(req, res)=> {
     }
 })
 
+
+
 // Red by query parameter
 app.get('/product', async (req, res) => {
    
     try {
         const price = req.query.price;
+        const rating = req.query.rating;
         let product;
         if(price){
-            product = await Product.find({ price: { $nin: [price] } });
+            product = await Product.find({$and: [{ price: { $nin: [price] } }, {rating: {$lte: rating}}]});
 
             if(product){
                 res.status(200).send(product);
