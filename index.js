@@ -47,39 +47,92 @@ app.get('/', (req, res)=> {
     res.send("Welcomet to home page");
 })
 
+// Create
 app.post('/products', async(req, res)=> {
     try {
         const { title, price, description } = req.body;
         // console.log("Body", title);
 
-        // const newProduct = new Product({
-        //     title: title,
-        //     price: price,
-        //     description: description
-        // });
+        const newProduct = new Product({
+            title: title,
+            price: price,
+            description: description
+        });
 
         // only one data save
-        // const productData = await newProduct.save();
+        const productData = await newProduct.save();
 
         //multiple data save
-        const productData = await Product.insertMany([
-            {
-                title: "iphone 12",
-                price: 1200,
-                description: "wow"
-            },
-            {
-                title: "iphone 11",
-                price: 1000,
-                description: "awosome"
-            }
-        ]);
+        // const productData = await Product.insertMany([
+        //     {
+        //         title: "iphone 12",
+        //         price: 1200,
+        //         description: "wow"
+        //     },
+        //     {
+        //         title: "iphone 11",
+        //         price: 1000,
+        //         description: "awosome"
+        //     }
+        // ]);
 
         res.status(201).send(productData);
     } catch (error) {
         res.status(500).send({message: error});
     }
 })
+
+// Red
+app.get('/products', async(req, res)=> {
+
+    try {
+        const products = await Product.find();
+        if(products){
+            res.status(200).send(products);
+        }else{
+            res.status(404).send({message: "products not found"});
+        }
+    } catch (error) {
+        res.status(500).send({message: error});
+    }
+})
+
+// Red by id
+app.get('/products/:id', async(req, res)=> {
+
+    try {
+        const id = req.params.id;
+
+        const product = await Product.findOne({_id:id});
+
+        if(product){
+            res.status(200).send(product);
+        }else{
+            res.status(404).send({message: "products not found"});
+        }
+    } catch (error) {
+        res.status(500).send({message: error});
+    }
+})
+
+// Red by query parameter
+// app.get('/product', async (req, res) => {
+   
+//     try {
+//         const id = req.query.id;
+//         const product = await Product.findOne({_id : id});
+//         if(product){
+//             res.status(200).send(product);
+//         }else{
+//             res.status(404).send({message: "products not found"});
+//         }
+//     } catch (error) {
+//         res.status(500).send({message: error});
+//     }
+
+   
+// })
+
 
 
 app.listen(port, async() => {
