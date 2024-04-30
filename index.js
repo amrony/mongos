@@ -116,22 +116,37 @@ app.get('/products/:id', async(req, res)=> {
 })
 
 // Red by query parameter
-// app.get('/product', async (req, res) => {
+app.get('/product', async (req, res) => {
    
-//     try {
-//         const id = req.query.id;
-//         const product = await Product.findOne({_id : id});
-//         if(product){
-//             res.status(200).send(product);
-//         }else{
-//             res.status(404).send({message: "products not found"});
-//         }
-//     } catch (error) {
-//         res.status(500).send({message: error});
-//     }
+    try {
+        const price = req.query.price;
+        let product;
+        if(price){
+            product = await Product.find({ price: { $nin: [price] } });
+
+            if(product){
+                res.status(200).send(product);
+            }else{
+                res.status(404).send({message: "products not found"});
+            }
+
+        }else{
+             product = await Product.find();
+
+             if(product){
+                res.status(200).send(product);
+            }else{
+                res.status(404).send({message: "products not found"});
+            }
+        }
+       
+   
+    } catch (error) {
+        res.status(500).send({message: error});
+    }
 
    
-// })
+})
 
 
 
