@@ -131,7 +131,7 @@ app.get('/product', async (req, res) => {
         const rating = req.query.rating;
         let product;
         if(price){
-            product = await Product.find({$and: [{ price: { $nin: [price] } }, {rating: {$lte: rating}}]});
+            product = await Product.find({$and: [{ price: { $nin: [price] } }, {rating: {$lte: rating}}]}).sort({ price: 1 });
 
             if(product){
                 res.status(200).send(product);
@@ -155,6 +155,26 @@ app.get('/product', async (req, res) => {
     }
 
    
+})
+
+
+
+// delete by id
+app.delete('/product/delete', async(req, res)=> {
+
+    try {
+        const id = req.query.id;
+
+        const product = await Product.deleteOne({ _id: id });
+
+        if(product){
+            res.status(200).send({message: "Successfully Product Deleted!"});
+        }else{
+            res.status(404).send({message: "products not found"});
+        }
+    } catch (error) {
+        res.status(500).send({message: error});
+    }
 })
 
 
